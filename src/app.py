@@ -7,12 +7,12 @@ import bcrypt
 import json
 
 app = Flask(__name__)
-CORS(app, resources={r"/usuarios/*": {"origins": "http://127.0.0.1:5500"}})
+CORS(app)
 
 # Inicializar Swagger
 swagger = Swagger(app)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root@127.0.0.1:3306/usuarios'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://sql8765576:5IicxCw7LJ@sql8.freesqldatabase.com:3306/sql8765576'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
@@ -251,5 +251,3 @@ def buscarUsu(nombre, contrasenia):
         
     return {"encontrado": False}
 
-if __name__ == '__main__':
-    app.run(debug=True)
