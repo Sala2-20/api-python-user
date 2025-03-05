@@ -16,7 +16,8 @@ swagger = Swagger(app,  template={
         "title": "API PY",
         "description": "API de python, Jorge Atienza uso de usuarios basico atraves de una API",
         "version": "1.0.0"
-    })
+    }
+)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://sql8765576:5IicxCw7LJ@sql8.freesqldatabase.com:3306/sql8765576'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
