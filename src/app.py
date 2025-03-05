@@ -7,7 +7,7 @@ import bcrypt
 import json
 
 app = Flask(__name__)
-CORS(app, resources={r"/api/*": {"origins": "*"}})
+CORS(app, resources={r"/*": {"origins": "*"}})
 
 # Inicializar Swagger
 swagger = Swagger(app)
