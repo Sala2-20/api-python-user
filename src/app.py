@@ -1,18 +1,17 @@
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
-from flasgger import Swagger  # Importar Swagger
+from flasgger import Swagger
 from flask_cors import CORS
 import bcrypt
 import json
 
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": "*"}})
-
-# Inicializar Swagger
+CORS(app, resources={r"/usuarios/*": {"origins": "http://127.0.0.1:5500"}})
 swagger = Swagger(app)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://sql8765576:5IicxCw7LJ@sql8.freesqldatabase.com:3306/sql8765576'
+
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root@127.0.0.1:3306/usuarios'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
@@ -22,17 +21,17 @@ salt = bcrypt.gensalt()
 class Usuarios(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     nombre = db.Column(db.String(100), nullable=False, unique=True)
-    contrasenia = db.Column(db.String(60), nullable=False)
+    contrasenia = db.Column(db.String(60), nullable=False)  # Ampliamos el tamaño del campo para almacenar el hash de bcrypt
     
     def __init__(self, nombre, contrasenia):
         self.setNombre(nombre)
         contrasenia = contrasenia.encode('utf-8')
-        self.setContrasenia(contrasenia)
+        self.setContrasenia(contrasenia)  # Convertimos el hash a string
         
-    def setNombre(self, nombre):
+    def setNombre(self,nombre):
         self.nombre = nombre
         
-    def setContrasenia(self, contrasenia):
+    def setContrasenia(self,contrasenia):
         self.contrasenia = bcrypt.hashpw(contrasenia, salt).decode('utf-8')
 
 # Crear las tablas
@@ -233,7 +232,8 @@ def destroy(id):
     """
     try:
         usuario = Usuarios.query.get(id)
-        
+        if usuario is None:
+          return {'message': 'Eliminado'}
         db.session.delete(usuario)
         db.session.commit()
     
@@ -242,6 +242,31 @@ def destroy(id):
         return {'message': 'Error al crear usuario'}, 400
 
 def buscarUsu(nombre, contrasenia):
+    """
+    Buscar un usuario por nombre y contraseña
+    ---
+    tags:
+      - Usuarios
+    parameters:
+      - name: nombre
+        in: query
+        type: string
+        description: Nombre del usuario
+      - name: contrasenia
+        in: query
+        type: string
+        description: Contraseña del usuario
+    responses:
+      200:
+        description: Usuario encontrado o no
+        schema:
+          type: object
+          properties:
+            encontrado:
+              type: boolean
+            id:
+              type: integer
+    """
     usuarios = Usuarios.query.all()
     resultados = usuarios_schema.dump(usuarios)
 
@@ -250,7 +275,6 @@ def buscarUsu(nombre, contrasenia):
             return {"encontrado": True, "id": obj["id"]}
         
     return {"encontrado": False}
+
 if __name__ == '__main__':
-    import os
-    port = int(os.environ.get('PORT', 5000))
-    app.run(debug=True, host='0.0.0.0', port=port)
+    app.run(debug=True)
