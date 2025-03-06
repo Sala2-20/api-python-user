@@ -169,7 +169,7 @@ def show_usuario(id):
 def update(id):
     """
     Actualizar los datos de un usuario
-    ---
+    --- 
     tags:
       - Usuarios
     parameters:
@@ -198,21 +198,31 @@ def update(id):
     """
     try:
         usuario = db.session.get(Usuarios, id)
-        nombre = request.json["nombre"]
-        contrasenia = request.json["contrasenia"].encode('utf-8')
+        if not usuario:
+            return {'message': 'Usuario no encontrado'}, 404
+        
+        nombre = request.json.get("nombre")
+        contrasenia = request.json.get("contrasenia")
+        
+        if not nombre or not contrasenia:
+            return {'message': 'Nombre y contraseña son requeridos'}, 400
+        
+        contrasenia = contrasenia.encode('utf-8')
         buscar = buscarUsu(nombre, contrasenia)
-        if buscar["encontrado"] and buscar["id"] == id:
+        
+        if buscar.get("encontrado") and buscar.get("id") == id:
             return {'encontrado': True}, 200
-        if nombre and contrasenia:
-            usuario.nombre = nombre
-            usuario.contrasenia = bcrypt.hashpw(contrasenia, salt).decode('utf-8')
-            
-            db.session.commit()
+
+        usuario.nombre = nombre
+        usuario.contrasenia = bcrypt.hashpw(contrasenia, salt).decode('utf-8')
+        
+        db.session.commit()
     
         return usuario_schema.jsonify(usuario)
     except Exception as e:
-        print(e)
-        return {'message': 'Error al crear usuario'}, 400
+        print(f"Error al actualizar el usuario: {e}")
+        return {'message': 'Error al actualizar el usuario'}, 400
+
 
 @app.route('/usuarios/<id>', methods=['DELETE'])
 def destroy(id):
