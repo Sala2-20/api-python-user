@@ -201,8 +201,8 @@ def update(id):
         nombre = request.json["nombre"]
         contrasenia = request.json["contrasenia"].encode('utf-8')
         buscar = buscarUsu(nombre, contrasenia)
-        if buscar["encontrado"] & buscar["id"] == id:
-            return {'creado': True}, 200
+        if buscar["encontrado"] and buscar["id"] == id:
+            return {'encontrado': True}, 200
         if nombre and contrasenia:
             usuario.nombre = nombre
             usuario.contrasenia = bcrypt.hashpw(contrasenia, salt).decode('utf-8')
@@ -210,7 +210,8 @@ def update(id):
             db.session.commit()
     
         return usuario_schema.jsonify(usuario)
-    except:
+    except Exception as e:
+        print(e)
         return {'message': 'Error al crear usuario'}, 400
 
 @app.route('/usuarios/<id>', methods=['DELETE'])
