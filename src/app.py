@@ -247,7 +247,7 @@ def destroy(id):
         return {'message': 'Error al crear usuario'}, 400
 
 def buscarUsu(nombre, contrasenia):
-    usuarios = db.session.get(Usuarios, id)
+    usuarios = Usuarios.query.all()
     resultados = usuarios_schema.dump(usuarios)
 
     for obj in resultados:
