@@ -159,7 +159,7 @@ def show_usuario(id):
         description: Error al obtener el usuario
     """
     try:
-        usuarios = Usuarios.query.get(id)
+        usuarios = db.session.get(Usuarios, id)
     
         return usuario_schema.jsonify(usuarios)
     except:
@@ -197,7 +197,7 @@ def update(id):
         description: Error al actualizar el usuario
     """
     try:
-        usuario = Usuarios.query.get(id)
+        usuario = db.session.get(Usuarios, id)
         nombre = request.json["nombre"]
         contrasenia = request.json["contrasenia"].encode('utf-8')
         buscar = buscarUsu(nombre, contrasenia)
@@ -235,7 +235,7 @@ def destroy(id):
         description: Error al eliminar el usuario
     """
     try:
-        usuario = Usuarios.query.get(id)
+        usuario = db.session.get(Usuarios, id)
         if usuario is None:
           return {'message': 'Eliminado'}, 200
         db.session.delete(usuario)
@@ -246,7 +246,7 @@ def destroy(id):
         return {'message': 'Error al crear usuario'}, 400
 
 def buscarUsu(nombre, contrasenia):
-    usuarios = Usuarios.query.all()
+    usuarios = db.session.get(Usuarios, id)
     resultados = usuarios_schema.dump(usuarios)
 
     for obj in resultados:
